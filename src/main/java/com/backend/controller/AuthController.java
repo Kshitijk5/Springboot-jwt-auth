@@ -51,11 +51,12 @@ public class AuthController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<JwtResponse> refreshTokenRequestHandler(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+    public ResponseEntity<JwtResponse> refreshTokenRequestHandler(
                                                                   @Valid @RequestBody RefreshDto refreshDto)
             throws JsonProcessingException {
-        JwtDecoder jwt = extractJwtDetails.Decoder(token);
-        return new ResponseEntity<>(authService.refreshService(refreshDto,jwt.getSub()),HttpStatus.OK);
+
+
+        return new ResponseEntity<>(authService.refreshService(refreshDto),HttpStatus.OK);
 
     }
 }

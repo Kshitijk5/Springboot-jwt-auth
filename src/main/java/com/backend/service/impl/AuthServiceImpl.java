@@ -82,28 +82,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponse refreshService(RefreshDto refreshDto, String email) {
+    public JwtResponse refreshService(RefreshDto refreshDto) {
 
         Optional<RefreshToken> refreshToken = refreshRepository.findByToken(refreshDto.getRefreshToken());
 
         if (refreshToken.isEmpty()) {
-            throw new APIException(HttpStatus.UNAUTHORIZED, "Refresh token " + refreshDto.getRefreshToken() + " not available for user with email " + email);
+            throw new APIException(HttpStatus.UNAUTHORIZED, "Refresh token " + refreshDto.getRefreshToken() + " not available for user with email " + refreshToken.get().getEmail());
         }
 
         Instant refreshTokenExpiryTime = refreshToken.get().getExpiry();
         Instant currentTime = Instant.now();
-        if (refreshToken.get().getEmail().equals(email)) {
+
             if (refreshTokenExpiryTime.isAfter(currentTime)) {
-                UserDetails user = customUserDetailService.loadUserByUsername(email);
+                UserDetails user = customUserDetailService.loadUserByUsername(refreshToken.get().getEmail());
                 String newAccessToken = jwtUtil.generateToken(user);
                 return new JwtResponse(newAccessToken, refreshToken.get().getToken());
             } else {
                 refreshRepository.deleteById(refreshToken.get().getId());
                 throw new APIException(HttpStatus.UNAUTHORIZED, "Refresh token has expired.Please re-authenticate yourself");
             }
-        } else
-            throw new APIException(HttpStatus.UNAUTHORIZED, "Refresh token doesn't belong to " + email);
-
-
-    }
+        }
 }

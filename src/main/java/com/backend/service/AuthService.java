@@ -12,5 +12,5 @@ public interface AuthService {
     public JwtResponse loginService(LoginDto loginDto);
     public APIResponse registerService(RegisterDto registerDto) throws Exception;
 
-    public JwtResponse refreshService( RefreshDto refreshDto,String email);
+    public JwtResponse refreshService( RefreshDto refreshDto);
 }
